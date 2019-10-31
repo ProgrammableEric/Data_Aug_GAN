@@ -61,6 +61,13 @@ class SegMapDataset (Dataset):
     """ Segmentation map dataset for 1st phase of the network. """
 
     def __init__(self, file_list, anno_root_dir, transform=None):
+        """
+        Args:
+            :param file_list: list of selected image file names to retrieve
+            :param anno_root_dir: Directory that the samples are stored
+            :param transform: Optional transform to be applied
+            on a sample.
+        """
         self.file_list = file_list
         self.anno_root_dir = anno_root_dir
         self.transform = transform
