@@ -18,7 +18,7 @@ ref_root_dir = "/Users/ericfu/Documents/ANU_Master/COMP8755_Project/dataset/ADEC
 anno_root_dir = "/Users/ericfu/Documents/ANU_Master/COMP8755_Project/dataset/" \
                "ADEChallengeData2016/annotations/training/"
 
-category = 'beach'      # modify to include multiple categories
+category = ['beach']      # multiple categories stored in a list
 ref_list_name = "sceneCategories.txt"
 file_list = []         # segmentation maps to use as training examples
 
@@ -32,7 +32,7 @@ if by_category:
     while line:
         n, c = line.split(" ")
         c = c[:-1]
-        if c == category:
+        if c in category:
             if train:
                 if 'train' in n:
                     file_list.append(n + ".png")
@@ -58,7 +58,7 @@ if by_category is False:
 
 
 class SegMapDataset (Dataset):
-    """ Segmentation map datasets for 1st phase of the network. """
+    """ Segmentation map dataset for 1st phase of the network. """
 
     def __init__(self, file_list, anno_root_dir, transform=None):
         self.file_list = file_list
@@ -81,6 +81,7 @@ class SegMapDataset (Dataset):
             sample = self.transform(sample)
 
         return sample
+
 
 class Rescale(object):
     """Rescale the image in a sample to a given size. Always assume that we want
