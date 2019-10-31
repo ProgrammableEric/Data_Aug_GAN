@@ -7,6 +7,7 @@ from torch.autograd import Variable
 from torchvision import transforms
 from torchvision.utils import save_image
 from torch.utils.data import Dataset, DataLoader
+import matplotlib.pyplot as plt
 import os
 from skimage import io, transform
 
@@ -82,7 +83,8 @@ class SegMapDataset (Dataset):
         return sample
 
 class Rescale(object):
-    """Rescale the image in a sample to a given size.
+    """Rescale the image in a sample to a given size. Always assume that we want
+    a square image input (h=w)
 
     Args:
         output_size (tuple or int): Desired output size. If tuple, output is
@@ -99,10 +101,12 @@ class Rescale(object):
 
         h, w = image.shape[:2]
         if isinstance(self.output_size, int):
-            if h > w:
-                new_h, new_w = self.output_size * h / w, self.output_size
-            else:
-                new_h, new_w = self.output_size, self.output_size * w / h
+            # if h > w:
+            #     new_h, new_w = self.output_size * h / w, self.output_size
+            # else:
+            #     new_h, new_w = self.output_size, self.output_size * w / h
+            new_h = self.output_size
+            new_w = self.output_size
         else:
             new_h, new_w = self.output_size
 
@@ -117,9 +121,12 @@ class Rescale(object):
 
 myData = SegMapDataset(file_list=file_list, anno_root_dir=anno_root_dir, transform=transforms.Compose([Rescale(256)]))
 
+k = 0
 for i in range(len(myData)):
     sample = myData[i]
     print(sample['image'].shape, sample['fileName'])
+
+
 
 
 
