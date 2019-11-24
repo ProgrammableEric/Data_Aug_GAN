@@ -25,7 +25,7 @@ file_list = []         # segmentation maps to use as training examples
 ref_list = os.path.join(ref_root_dir, ref_list_name)
 f = open(ref_list)
 
-# Prepare segmentation maps from specified category of scenes
+# Prepare segmentation maps from specified category of scenes ！！
 if by_category:
 
     line = f.readline()
