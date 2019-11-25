@@ -12,4 +12,7 @@ print (image.shape)
 print (image)
 # print ObjectClassMasks
 
+im = io.imread(img_name)
+print(im)
+print(im.shape)
 

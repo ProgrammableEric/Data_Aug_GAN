@@ -32,12 +32,13 @@ if by_category:
     while line:
         n, c = line.split(" ")
         c = c[:-1]
+        path = os.path.join(anno_root_dir, n + ".png")
         if c in category:
             if train:
-                if 'train' in n:
+                if 'train' in n and io.imread(path).shape == (256 ,256):
                     file_list.append(n + ".png")
             else:
-                if "val" in n:
+                if "val" in n and io.imread(path).shape == (256 ,256):
                     file_list.append(n + ".png")
         line = f.readline()
     f.close()
@@ -120,22 +121,26 @@ class Rescale(object):
 
         new_h, new_w = int(new_h), int(new_w)
 
-        img = transform.resize(image, (new_h, new_w))
+        img = transform.resize(image, (new_h, new_w), preserve_range=True)
 
         # h and w are swapped for landmarks because for images,
         # x and y axes are axis 1 and 0 respectively
 
         return {'image': img, 'fileName': fileName}
 
-myData = SegMapDataset(file_list=file_list, anno_root_dir=anno_root_dir, transform=transforms.Compose([Rescale(256)]))
+myData = SegMapDataset(file_list=file_list, anno_root_dir=anno_root_dir)
 
 k = 0
+
 for i in range(len(myData)):
     sample = myData[i]
     print(sample['image'].shape, sample['fileName'])
 
+dataloader = DataLoader(myData, batch_size=4,               # load data in chosen manner
+                            shuffle=True, num_workers=4)
 
-
+print(myData[3]['image'])
+plt.pause(10)
 
 
 
