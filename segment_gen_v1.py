@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import os
 from skimage import io, transform
+from one_hot_try import covertToOnehot
+from one_hot_try import genRefMap
 
 # Set random seed for reproducibility
 manualSeed = 999
@@ -38,6 +40,8 @@ file_list = []         # segmentation maps to use as training examples
 
 ref_list = os.path.join(ref_root_dir, ref_list_name)
 f = open(ref_list)
+
+classSet = set()    # what classes that the dataset contains.
 
 # Prepare segmentation maps from specified category of scenes ！！
 if by_category:
@@ -72,6 +76,15 @@ if by_category is False:
         line = f.readline()
     f.close()
 
+# Prepare the class list.
+for file in file_list:
+    im = io.imread(os.path.join(anno_root_dir, file))
+    imArray = np.asarray(im).reshape(1, -1)
+    imClasses = np.unique(imArray)
+    for c in imClasses:
+        classSet.add(c)
+
+refMap, num_classes = genRefMap(classSet)
 
 
 
@@ -113,7 +126,6 @@ ngpu = 1
 
 
 
-
 """ PREPARE THE DATASET """
 
 class SegMapDataset (Dataset):
@@ -135,13 +147,19 @@ class SegMapDataset (Dataset):
         return len(file_list)
 
     def __getitem__(self, idx):
+        """
+        :param idx: line index of the file in the file list
+        :return: one-hot encoded segmentation map in shape of 256*256-by-number_of_semantic_categories
+        """
+
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
         seg_map_name = os.path.join(self.anno_root_dir, self.file_list[idx])
         image = io.imread(seg_map_name)
+        img = covertToOnehot(image, refMap, num_classes)
 
-        sample = {'image': image, 'fileName': seg_map_name}
+        sample = {'image': img, 'fileName': seg_map_name}
 
         if self.transform:
             sample = self.transform(sample)
@@ -195,15 +213,15 @@ dataloader = DataLoader(dataset, batch_size=batch_size,               # load dat
 # Decide which device we want to run on
 device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
 
-# Plot some training images
-real_batch = next(iter(dataloader))
-print(real_batch)
-plt.figure(figsize=(2,4))
-plt.axis("off")
-plt.title("Training Images")
-plt.imshow(np.transpose(vutils.make_grid(real_batch['image'][0].to(device)[:8], padding=2, normalize=False).cpu(),(1,2,0)))
-plt.imshow(dataset[0]['image'])
-plt.pause(10)
+# # Plot some training images
+# real_batch = next(iter(dataloader))
+# print(real_batch)
+# plt.figure(figsize=(2,4))
+# plt.axis("off")
+# plt.title("Training Images")
+# plt.imshow(np.transpose(vutils.make_grid(real_batch['image'][0].to(device)[:8], padding=2, normalize=False).cpu(),(1,2,0)))
+# plt.imshow(dataset[0]['image'])
+# plt.pause(10)
 
 
 
