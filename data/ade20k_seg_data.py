@@ -74,6 +74,14 @@ for file in file_list:
 
 refMap, num_classes = genRefMap(classSet)
 
+# Temporary testing use
+# testimg = io.imread(os.path.join(anno_root_dir, file_list[1]))
+# print(testimg.shape)
+# rtn = covertToOnehot(testimg, refMap, num_classes)
+# print(rtn.shape)
+# print(rtn)
+# print(rtn[1][1])
+
 
 
 class SegMapDataset (Dataset):

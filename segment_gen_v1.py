@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from torch.nn.functional import softmax
 import random
 from torch.utils.data import Dataset, DataLoader
 import torchvision.utils as vutils
@@ -101,16 +102,16 @@ batch_size = 8
 image_size = 256
 
 # Number of channels in the training images.
-nc = 20
+nc = num_classes
 
 # Size of z latent vector (i.e. size of generator input)
 nz = 100
 
 # Size of feature maps in generator
-ngf = 256
+ngf = 40
 
-# Size of feature maps in discriminator
-ndf = 256
+# Size of feature maps in discriminator (SET TO WHAT NUMBER????)
+ndf = 32
 
 # Number of training epochs
 num_epochs = 5
@@ -243,29 +244,39 @@ class Generator(nn.Module):
         self.ngpu = ngpu
         self.main = nn.Sequential(
             # input is Z, going into a convolution
-            nn.ConvTranspose2d( nz, ngf * 8, 4, 1, 0, bias=False),
-            nn.BatchNorm2d(ngf * 8),
+            nn.ConvTranspose2d( nz, ngf * 32, 4, 1, 0, bias=False),
+            nn.BatchNorm2d(ngf * 32),
             nn.ReLU(True),
             # state size. (ngf*8) x 4 x 4
-            nn.ConvTranspose2d(ngf * 8, ngf * 4, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ngf * 4),
+            nn.ConvTranspose2d(ngf * 32, ngf * 16, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ngf * 16),
             nn.ReLU(True),
             # state size. (ngf*4) x 8 x 8
-            nn.ConvTranspose2d( ngf * 4, ngf * 2, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ngf * 2),
+            nn.ConvTranspose2d( ngf * 16, ngf * 8, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ngf * 8),
             nn.ReLU(True),
             # state size. (ngf*2) x 16 x 16
-            nn.ConvTranspose2d( ngf * 2, ngf, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ngf),
+            nn.ConvTranspose2d( ngf * 8, ngf * 4, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ngf * 4),
             nn.ReLU(True),
             # state size. (ngf) x 32 x 32
-            nn.ConvTranspose2d( ngf, nc, 4, 2, 1, bias=False),
+            nn.ConvTranspose2d(ngf * 4, ngf * 2, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ngf * 2),
+            nn.ReLU(True),
+            # state size. (ngf) x 64 x 64
+            nn.ConvTranspose2d(ngf * 2, ngf, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ngf),
+            nn.ReLU(True),
+            # state size. (ngf) x 128 x 128
+            nn.ConvTranspose2d(ngf, nc, 4, 2, 1, bias=False),
             nn.Tanh()
-            # state size. (nc) x 64 x 64
+
+            # state size. (nc) x 256 x 256
+
         )
 
     def forward(self, input):
-        return self.main(input)
+        return softmax(self.main(input), 2)
 
     # Create the generator
 netG = Generator(ngpu).to(device)
@@ -287,23 +298,31 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         self.ngpu = ngpu
         self.main = nn.Sequential(
-            # input is (nc) x 64 x 64
+            # input is (nc) x 256 x 256
             nn.Conv2d(nc, ndf, 4, 2, 1, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (ndf) x 32 x 32
+            # state size. (ndf) x 128 x 128
             nn.Conv2d(ndf, ndf * 2, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf * 2),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (ndf*2) x 16 x 16
+            # state size. (ndf*2) x 64 x 64
             nn.Conv2d(ndf * 2, ndf * 4, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf * 4),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (ndf*4) x 8 x 8
+            # state size. (ndf*4) x 32 x 32
             nn.Conv2d(ndf * 4, ndf * 8, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf * 8),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (ndf*8) x 4 x 4
-            nn.Conv2d(ndf * 8, 1, 4, 1, 0, bias=False),
+            # state size. (ndf*8) x 16x 16
+            nn.Conv2d(ndf * 8, ndf * 16, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ndf * 16),
+            nn.LeakyReLU(0.2, inplace=True),
+            # state size. (ndf*16) x 8 x 8
+            nn.Conv2d(ndf * 16, ndf * 32, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ndf * 32),
+            nn.LeakyReLU(0.2, inplace=True),
+            # state size. (ndf*16) x 4 x 4
+            nn.Conv2d(ndf * 32, 1, 4, 1, 0, bias=False),
             nn.Sigmoid()
         )
 
@@ -330,7 +349,7 @@ criterion = nn.BCELoss()
 
 # Create batch of latent vectors that we will use to visualize
 #  the progression of the generator
-fixed_noise = torch.randn(64, nz, 1, 1, device=device)
+fixed_noise = torch.randn(256, nz, 1, 1, device=device)
 
 # Establish convention for real and fake labels during training
 real_label = 1
@@ -361,7 +380,7 @@ for epoch in range(num_epochs):
         ## Train with all-real batch
         netD.zero_grad()
         # Format batch
-        real_cpu = data[0].to(device)
+        real_cpu = data['image'][0].to(device)
         b_size = real_cpu.size(0)
         label = torch.full((b_size,), real_label, device=device)
         # Forward pass real batch through D

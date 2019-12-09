@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="640bf301-4da1-4559-bcaa-922ca3b25bac" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/ade20k_seg_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/ade20k_seg_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/one_hot_try.py" beforeDir="false" afterPath="$PROJECT_DIR$/one_hot_try.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/segment_gen_v1.py" beforeDir="false" afterPath="$PROJECT_DIR$/segment_gen_v1.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -16,8 +17,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/segment_gen_v1.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="225">
-              <caret line="347" column="5" selection-start-line="347" selection-start-column="5" selection-end-line="347" selection-end-column="5" />
+            <state relative-caret-position="488">
+              <caret line="382" column="46" lean-forward="true" selection-start-line="382" selection-start-column="46" selection-end-line="382" selection-end-column="46" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
               </folding>
@@ -28,8 +29,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data/ade20k_seg_data.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="393">
-              <caret line="102" column="8" selection-start-line="102" selection-start-column="8" selection-end-line="102" selection-end-column="56" />
+            <state relative-caret-position="-553">
+              <caret line="44" column="58" selection-start-line="44" selection-start-column="58" selection-end-line="44" selection-end-column="58" />
               <folding>
                 <element signature="e#24#42#0" expanded="true" />
               </folding>
@@ -40,8 +41,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/one_hot_try.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="493">
-              <caret line="29" lean-forward="true" selection-start-line="29" selection-end-line="29" />
+            <state relative-caret-position="629">
+              <caret line="48" lean-forward="true" selection-start-line="48" selection-end-line="48" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
               </folding>
@@ -127,7 +128,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.ade20k_data">
+  <component name="RunManager" selected="Python.segment_gen_v1">
     <configuration name="ade20k_data" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Data_Aug_GAN" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -214,9 +215,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.segment_gen_v1" />
         <item itemvalue="Python.ade20k_data" />
         <item itemvalue="Python.one_hot_try" />
-        <item itemvalue="Python.segment_gen_v1" />
         <item itemvalue="Python.peek_my_pic" />
       </list>
     </recent_temporary>
@@ -252,13 +253,13 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.34611398" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.10526316" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32956153" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32956153" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.49960285" visible="true" weight="0.058114037" />
+      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.49960285" weight="0.17653508" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50039715" side_tool="true" weight="0.23196605" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.32928064" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -317,8 +318,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/one_hot_try.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="493">
-          <caret line="29" lean-forward="true" selection-start-line="29" selection-end-line="29" />
+        <state relative-caret-position="629">
+          <caret line="48" lean-forward="true" selection-start-line="48" selection-end-line="48" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
           </folding>
@@ -327,8 +328,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/data/ade20k_seg_data.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="393">
-          <caret line="102" column="8" selection-start-line="102" selection-start-column="8" selection-end-line="102" selection-end-column="56" />
+        <state relative-caret-position="-553">
+          <caret line="44" column="58" selection-start-line="44" selection-start-column="58" selection-end-line="44" selection-end-column="58" />
           <folding>
             <element signature="e#24#42#0" expanded="true" />
           </folding>
@@ -337,8 +338,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/segment_gen_v1.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="347" column="5" selection-start-line="347" selection-start-column="5" selection-end-line="347" selection-end-column="5" />
+        <state relative-caret-position="488">
+          <caret line="382" column="46" lean-forward="true" selection-start-line="382" selection-start-column="46" selection-end-line="382" selection-end-column="46" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
           </folding>

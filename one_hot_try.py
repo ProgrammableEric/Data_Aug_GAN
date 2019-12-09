@@ -35,15 +35,17 @@ def covertToOnehot(img, refMap, num_classes):
     :param img: of type 'imageio.core.util.Array'
     :param refMap: Class reference map, in the form of { pixel value: class code }
     :param num_classes: Total number of semantic classes within the dataset
-    :return: 2D numpy array, one-hot encoded image of size (h*w, num_classes)
+    :return: 3D numpy array, one-hot encoded image of size (H-by-W-by-num_classes)
     """
+    h = img.shape[0]
+    w = img.shape[1]
+    img = np.asarray(img)
+    num_ele = h * w
 
-    img = np.asarray(img).reshape(1, -1)[0]
-    num_ele = len(img)
-
-    rtn = np.zeros((num_ele, num_classes))
-    for j, pixel in enumerate(img):
-        rtn[j][refMap[pixel]] = 1
+    rtn = np.zeros((num_classes, h, w))
+    for j, _ in enumerate(img):
+        for k, pixel in enumerate(img[j]):
+            rtn[refMap[pixel]][j][k] = 1
 
     return rtn
 
