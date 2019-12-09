@@ -100,8 +100,8 @@ batch_size = 8
 #   size using a transformer.
 image_size = 256
 
-# Number of channels in the training images. For color images this is 3
-nc = 1
+# Number of channels in the training images.
+nc = 20
 
 # Size of z latent vector (i.e. size of generator input)
 nz = 100
