@@ -15,6 +15,8 @@ from skimage import io, transform
 from one_hot_try import covertToOnehot
 from one_hot_try import genRefMap
 
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
+
 # Set random seed for reproducibility
 manualSeed = 999
 #manualSeed = random.randint(1, 10000) # use if you want new results
@@ -108,7 +110,7 @@ nc = num_classes
 nz = 100
 
 # Size of feature maps in generator
-ngf = 40
+ngf = 32
 
 # Size of feature maps in discriminator (SET TO WHAT NUMBER????)
 ndf = 32
@@ -225,8 +227,6 @@ device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else 
 # plt.pause(10)
 
 
-
-
 """ GAN IMPLEMENTATION """
 
 # custom weights initialization called on netG and netD
@@ -237,6 +237,7 @@ def weights_init(m):
     elif classname.find('BatchNorm') != -1:
         nn.init.normal_(m.weight.data, 1.0, 0.02)
         nn.init.constant_(m.bias.data, 0)
+
 
 class Generator(nn.Module):
     def __init__(self, ngpu):
@@ -269,7 +270,7 @@ class Generator(nn.Module):
             nn.ReLU(True),
             # state size. (ngf) x 128 x 128
             nn.ConvTranspose2d(ngf, nc, 4, 2, 1, bias=False),
-            nn.Tanh()
+            nn.Softmax2d()
 
             # state size. (nc) x 256 x 256
 
@@ -327,6 +328,7 @@ class Discriminator(nn.Module):
         )
 
     def forward(self, input):
+        input = torch.tensor(input, dtype=torch.float32)
         return self.main(input)
 
 # Create the Discriminator
@@ -349,7 +351,7 @@ criterion = nn.BCELoss()
 
 # Create batch of latent vectors that we will use to visualize
 #  the progression of the generator
-fixed_noise = torch.randn(256, nz, 1, 1, device=device)
+fixed_noise = torch.randn(32, nz, 1, 1, device=device)
 
 # Establish convention for real and fake labels during training
 real_label = 1
@@ -373,15 +375,18 @@ print("Starting Training Loop...")
 for epoch in range(num_epochs):
     # For each batch in the dataloader
     for i, data in enumerate(dataloader, 0):
-
+        print('Epoch: ', epoch, 'batch: ', i)
+        print('A BATCH')
+        print(data['image'].shape)
         ############################
         # (1) Update D network: maximize log(D(x)) + log(1 - D(G(z)))
         ###########################
         ## Train with all-real batch
         netD.zero_grad()
         # Format batch
-        real_cpu = data['image'][0].to(device)
+        real_cpu = data['image'].to(device)
         b_size = real_cpu.size(0)
+        print ('b_size: ', b_size)
         label = torch.full((b_size,), real_label, device=device)
         # Forward pass real batch through D
         output = netD(real_cpu).view(-1)
@@ -434,13 +439,13 @@ for epoch in range(num_epochs):
         G_losses.append(errG.item())
         D_losses.append(errD.item())
 
-        # Check how the generator is doing by saving G's output on fixed_noise
-        if (iters % 500 == 0) or ((epoch == num_epochs-1) and (i == len(dataloader)-1)):
-            with torch.no_grad():
-                fake = netG(fixed_noise).detach().cpu()
-            img_list.append(vutils.make_grid(fake, padding=2, normalize=True))
-
-        iters += 1
+        # # Check how the generator is doing by saving G's output on fixed_noise
+        # if (iters % 500 == 0) or ((epoch == num_epochs-1) and (i == len(dataloader)-1)):
+        #     with torch.no_grad():
+        #         fake = netG(fixed_noise).detach().cpu()
+        #     img_list.append(vutils.make_grid(fake, padding=2, normalize=True))
+        #
+        # iters += 1
 
 
 plt.figure(figsize=(10,5))
