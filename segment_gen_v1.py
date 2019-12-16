@@ -97,7 +97,7 @@ refMap, num_classes = genRefMap(classSet)
 workers = 2
 
 # Batch size during training
-batch_size = 8
+batch_size = 4
 
 # Spatial size of training images. All images will be resized to this
 #   size using a transformer.
@@ -116,7 +116,7 @@ ngf = 32
 ndf = 32
 
 # Number of training epochs
-num_epochs = 5
+num_epochs = 50
 
 # Learning rate for optimizers
 lr = 0.0002
@@ -270,7 +270,7 @@ class Generator(nn.Module):
             nn.ReLU(True),
             # state size. (ngf) x 128 x 128
             nn.ConvTranspose2d(ngf, nc, 4, 2, 1, bias=False),
-            nn.Softmax2d()
+            nn.Softmax(dim=1)
 
             # state size. (nc) x 256 x 256
 
@@ -351,7 +351,7 @@ criterion = nn.BCELoss()
 
 # Create batch of latent vectors that we will use to visualize
 #  the progression of the generator
-fixed_noise = torch.randn(32, nz, 1, 1, device=device)
+fixed_noise = torch.randn(32, nz, device=device)
 
 # Establish convention for real and fake labels during training
 real_label = 1
@@ -385,11 +385,14 @@ for epoch in range(num_epochs):
         netD.zero_grad()
         # Format batch
         real_cpu = data['image'].to(device)
+        print("real cpu shape: ", real_cpu.shape)
         b_size = real_cpu.size(0)
         print ('b_size: ', b_size)
         label = torch.full((b_size,), real_label, device=device)
+        print("label shape: ", label.shape)
         # Forward pass real batch through D
         output = netD(real_cpu).view(-1)
+        print("output:", output)
         # Calculate loss on all-real batch
         errD_real = criterion(output, label)
         # Calculate gradients for D in backward pass
@@ -398,12 +401,16 @@ for epoch in range(num_epochs):
 
         ## Train with all-fake batch
         # Generate batch of latent vectors
-        noise = torch.randn(b_size, nz, 1, 1, device=device)
+        noise = torch.randn(b_size, nz, 1, 1, device=device)*100
         # Generate fake image batch with G
         fake = netG(noise)
+        print("fake size: ", fake.shape)
+        print(fake[2][10])
         label.fill_(fake_label)
+        print("label fake: ", label)
         # Classify all fake batch with D
         output = netD(fake.detach()).view(-1)
+        print("fake output: ", output)
         # Calculate D's loss on the all-fake batch
         errD_fake = criterion(output, label)
         # Calculate the gradients for this batch
@@ -411,6 +418,8 @@ for epoch in range(num_epochs):
         D_G_z1 = output.mean().item()
         # Add the gradients from the all-real and all-fake batches
         errD = errD_real + errD_fake
+        print("error D real: ", errD_real)
+        print("error D fake: ", errD_fake)
         # Update D
         optimizerD.step()
 
@@ -421,6 +430,7 @@ for epoch in range(num_epochs):
         label.fill_(real_label)  # fake labels are real for generator cost
         # Since we just updated D, perform another forward pass of all-fake batch through D
         output = netD(fake).view(-1)
+        print("G output: ", output.shape)
         # Calculate G's loss based on this output
         errG = criterion(output, label)
         # Calculate gradients for G
