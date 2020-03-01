@@ -11,8 +11,8 @@ from sklearn.preprocessing import OneHotEncoder
 import matplotlib.pyplot as plt
 import os
 from skimage import io, transform
-from one_hot_try import covertToOnehot
-from one_hot_try import genRefMap
+from one_hot_helper import covertToOnehot
+from one_hot_helper import genRefMap
 
 #np.set_printoptions(threshold=np.inf)
 

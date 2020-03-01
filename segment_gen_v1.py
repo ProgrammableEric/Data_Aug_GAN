@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import os
 from skimage import io, transform
-from one_hot_try import covertToOnehot
-from one_hot_try import genRefMap
+from one_hot_helper import covertToOnehot
+from one_hot_helper import genRefMap
 
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
@@ -44,7 +44,7 @@ file_list = []         # segmentation maps to use as training examples
 ref_list = os.path.join(ref_root_dir, ref_list_name)
 f = open(ref_list)
 
-classSet = set()    # what classes that the dataset contains.
+classSet = set()    # what classes the dataset contains.
 
 # Prepare segmentation maps from specified category of scenes ！！
 if by_category:
@@ -84,6 +84,8 @@ for file in file_list:
     im = io.imread(os.path.join(anno_root_dir, file))
     imArray = np.asarray(im).reshape(1, -1)
     imClasses = np.unique(imArray)
+
+
     for c in imClasses:
         classSet.add(c)
 
