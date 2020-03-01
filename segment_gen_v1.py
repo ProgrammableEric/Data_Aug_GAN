@@ -14,6 +14,7 @@ import os
 from skimage import io, transform
 from one_hot_helper import covertToOnehot
 from one_hot_helper import genRefMap
+from one_hot_helper import combineClasses
 
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
@@ -79,12 +80,12 @@ if by_category is False:
         line = f.readline()
     f.close()
 
-# Prepare the class list.
+# Prepare the class list
 for file in file_list:
     im = io.imread(os.path.join(anno_root_dir, file))
     imArray = np.asarray(im).reshape(1, -1)
     imClasses = np.unique(imArray)
-
+    imClasses = combineClasses(imClasses)
 
     for c in imClasses:
         classSet.add(c)

@@ -13,6 +13,7 @@ import os
 from skimage import io, transform
 from one_hot_helper import covertToOnehot
 from one_hot_helper import genRefMap
+from one_hot_helper import combineClasses
 
 #np.set_printoptions(threshold=np.inf)
 
@@ -67,12 +68,17 @@ if by_category is False:
 # Prepare the class list.
 for file in file_list:
     im = io.imread(os.path.join(anno_root_dir, file))
-    imArray = np.asarray(im).reshape(1, -1)
+    imArray = np.asarray(im).reshape(1, -1)[0]
+    print('imArray: ', imArray, 'len: ', len(imArray))
+    imArray = combineClasses(imArray)
     imClasses = np.unique(imArray)
+    print('!!!!!!!!!!', imClasses)
     for c in imClasses:
         classSet.add(c)
 
+print(classSet)
 refMap, num_classes = genRefMap(classSet)
+print('num class: ', num_classes)
 
 # Temporary testing use
 # testimg = io.imread(os.path.join(anno_root_dir, file_list[1]))
@@ -81,8 +87,6 @@ refMap, num_classes = genRefMap(classSet)
 # print(rtn.shape)
 # print(rtn)
 # print(rtn[1][1])
-
-
 
 class SegMapDataset (Dataset):
     """ Segmentation map dataset for 1st phase of the network. """
@@ -159,9 +163,11 @@ myData = SegMapDataset(file_list=file_list, anno_root_dir=anno_root_dir)
 
 k = 0
 
+print(len(myData))
+
 for i in range(len(myData)):
     sample = myData[i]
-    print(sample['image'].shape, sample['fileName'])
+    print(i, sample['image'].shape, sample['fileName'])
 
 dataloader = DataLoader(myData, batch_size=4,               # load data in chosen manner
                             shuffle=True, num_workers=4)

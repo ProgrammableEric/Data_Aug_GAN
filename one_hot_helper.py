@@ -1,6 +1,17 @@
 import torch
 import numpy as np
 
+
+## Map relation to combine multiple similar classes into one.
+to_Combine = {
+    5: [73, 18],  ## tree <- pulm tree, plant,
+    2: [26, ],  ## building <- house
+    17: [69, ],  ## mountain <- hill
+    95: [62, ]  ## land <- bridge
+}
+
+
+
 def genRefMap (classSet):
 
     """
@@ -22,6 +33,8 @@ def genRefMap (classSet):
     refMap = {}
     for i, element in enumerate(cArray):
         refMap[element] = i
+
+    print(refMap)
 
     return refMap, num_classes
 
@@ -49,3 +62,29 @@ def covertToOnehot(img, refMap, num_classes):
 
     return rtn
 
+
+def combineClasses(imArray):
+
+    '''
+    This function takes pre-processed image class list and combine object class based on the rule
+    defined in to_Combine. And return the modified class list accordingly.
+    :param imClasses: 1-by-n np array
+    :return: 1-by-n np array
+    '''
+    to_Combine = {
+        5: [73, 18 ], ## tree <- pulm tree, plant,
+        2: [26, ], ## building <- house
+        17: [69, ], ## mountain <- hill
+        95: [62, ] ## land <- bridge
+    }
+
+    for c in range(0, len(imArray)):
+        for k in to_Combine:
+            if imArray[c] in to_Combine[k]:
+                imArray[c] = k
+
+    return imArray
+
+# a = np.asarray([[1,2,3], [3,2,1]])
+# print(a)
+# print(a.reshape(1, -1)[0])
