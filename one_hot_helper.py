@@ -52,7 +52,8 @@ def covertToOnehot(img, refMap, num_classes):
     """
     h = img.shape[0]
     w = img.shape[1]
-    img = np.asarray(img)
+    img = np.asarray(img)   ## img 格式问题，一行还是r行？
+    img = combineClasses(img)
     num_ele = h * w
 
     rtn = np.zeros((num_classes, h, w))

@@ -69,10 +69,9 @@ if by_category is False:
 for file in file_list:
     im = io.imread(os.path.join(anno_root_dir, file))
     imArray = np.asarray(im).reshape(1, -1)[0]
-    print('imArray: ', imArray, 'len: ', len(imArray))
     imArray = combineClasses(imArray)
     imClasses = np.unique(imArray)
-    print('!!!!!!!!!!', imClasses)
+    print("imClass: ", imClasses)
     for c in imClasses:
         classSet.add(c)
 
