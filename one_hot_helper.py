@@ -39,7 +39,7 @@ def genRefMap (classSet):
     return refMap, num_classes
 
 
-def covertToOnehot(imArray, refMap, cNum):
+def covertToOnehot(imArray, refMap, cNum, Size):
 
     """
     This function takes the ioread output, and class reference map to encode the original image
@@ -56,6 +56,8 @@ def covertToOnehot(imArray, refMap, cNum):
 
     for k, pixel in enumerate(imArray):
         rtn[refMap[pixel]][k] = 1
+
+    rtn = rtn.reshape(cNum, Size, Size)
 
     return rtn
 

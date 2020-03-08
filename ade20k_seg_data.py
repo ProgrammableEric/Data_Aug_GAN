@@ -54,7 +54,7 @@ class SegMapDataset (Dataset):
         seg_map_name = os.path.join(self.anno_root_dir, self.file_list[idx])
         image = io.imread(seg_map_name)
         imArray = self.imArray_list[idx]
-        oneHot = covertToOnehot(imArray, self.refMap, self.cNum)
+        oneHot = covertToOnehot(imArray, self.refMap, self.cNum, 256)
 
         sample = {'image': image, 'imArray': imArray, 'oneHot': oneHot, 'fileName': seg_map_name}
 
@@ -101,7 +101,23 @@ class Rescale(object):
 
         return {'image': img, 'fileName': fileName}
 
-myData = SegMapDataset(file_list=file_list, imArray_list= imArray_list, anno_root_dir=anno_root_dir, refMap=refMap)
+class ToTensor(object):
+    """Convert ndarrays in sample to Tensors."""
+
+    def __call__(self, sample):
+        image, imArray, oneHot, fileName = sample['image'], sample['imArray'], sample['oneHot'], sample['fileName']
+
+        # swap color axis because
+        # numpy image: H x W x C
+        # torch image: C X H X W
+
+        return {'image': torch.from_numpy(image),
+                'imArray': imArray,
+                'oneHot': oneHot,
+                'fileName': fileName }
+
+myData = SegMapDataset(file_list=file_list, imArray_list= imArray_list, anno_root_dir=anno_root_dir, refMap=refMap,
+                       transform=transforms.Compose([ToTensor()]))
 
 k = 0
 
@@ -115,7 +131,7 @@ dataloader = DataLoader(myData, batch_size=4,               # load data in chose
                             shuffle=True, num_workers=4)
 
 print(myData[3]['oneHot'].shape, myData[3]['oneHot'][:, 10])
-
+print(type(myData[3]['image']), myData[3]['image'].shape)
 
 
 
