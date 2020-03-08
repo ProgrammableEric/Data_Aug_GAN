@@ -19,6 +19,7 @@ from one_hot_helper import combineClasses
 
 from pre_data import file_list, imArray_list, refMap
 
+
 ref_root_dir = "/Users/ericfu/Documents/ANU_Master/COMP8755_Project/dataset/ADEChallengeData2016/"
 anno_root_dir = "/Users/ericfu/Documents/ANU_Master/COMP8755_Project/dataset/" \
                "ADEChallengeData2016/annotations/training/"

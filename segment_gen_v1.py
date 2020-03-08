@@ -32,8 +32,6 @@ torch.manual_seed(manualSeed)
 train = True
 by_category = True     # Load data from selected categories
 
-# Root directory for dataset
-
 ref_root_dir = "/Users/ericfu/Documents/ANU_Master/COMP8755_Project/dataset/ADEChallengeData2016/"
 anno_root_dir = "/Users/ericfu/Documents/ANU_Master/COMP8755_Project/dataset/" \
                "ADEChallengeData2016/annotations/training/"
@@ -41,11 +39,12 @@ anno_root_dir = "/Users/ericfu/Documents/ANU_Master/COMP8755_Project/dataset/" \
 category = ['beach']      # multiple categories stored in a list
 ref_list_name = "sceneCategories.txt"
 file_list = []         # segmentation maps to use as training examples
+imArray_list = []
 
 ref_list = os.path.join(ref_root_dir, ref_list_name)
 f = open(ref_list)
 
-classSet = set()    # what classes the dataset contains.
+classSet = set()    # what classes that the dataset contains.
 
 # Prepare segmentation maps from specified category of scenes ！！
 if by_category:
@@ -62,7 +61,6 @@ if by_category:
             else:
                 if "val" in n and io.imread(path).shape == (256 ,256):
                     file_list.append(n + ".png")
-
         line = f.readline()
     f.close()
 
@@ -80,17 +78,20 @@ if by_category is False:
         line = f.readline()
     f.close()
 
-# Prepare the class list
+# Prepare the image Arrays and class list.
 for file in file_list:
     im = io.imread(os.path.join(anno_root_dir, file))
-    imArray = np.asarray(im).reshape(1, -1)
+    imArray = np.asarray(im).reshape(1, -1)[0]
+    imArray = combineClasses(imArray)
+    imArray_list.append(imArray)
     imClasses = np.unique(imArray)
-    imClasses = combineClasses(imClasses)
-
+    print("imClass: ", imClasses)
     for c in imClasses:
         classSet.add(c)
 
+print(classSet)
 refMap, num_classes = genRefMap(classSet)
+print('num classes: ', num_classes)
 
 
 
@@ -137,7 +138,7 @@ ngpu = 1
 class SegMapDataset (Dataset):
     """ Segmentation map dataset for 1st phase of the network. """
 
-    def __init__(self, file_list, anno_root_dir, transform=None):
+    def __init__(self, file_list, imArray_list, anno_root_dir, refMap, transform=None):
         """
         Args:
             :param file_list: list of selected image file names to retrieve
@@ -146,26 +147,25 @@ class SegMapDataset (Dataset):
             on a sample.
         """
         self.file_list = file_list
+        self.imArray_list = imArray_list
         self.anno_root_dir = anno_root_dir
+        self.refMap = refMap
+        self.cNum = len(refMap)
         self.transform = transform
 
     def __len__(self):
         return len(file_list)
 
     def __getitem__(self, idx):
-        """
-        :param idx: line index of the file in the file list
-        :return: one-hot encoded segmentation map in shape of 256*256-by-number_of_semantic_categories
-        """
-
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
         seg_map_name = os.path.join(self.anno_root_dir, self.file_list[idx])
         image = io.imread(seg_map_name)
-        img = covertToOnehot(image, refMap, num_classes)
+        imArray = self.imArray_list[idx]
+        oneHot = covertToOnehot(imArray, self.refMap, self.cNum)
 
-        sample = {'image': img, 'fileName': seg_map_name}
+        sample = {'image': image, 'imArray': imArray, 'oneHot': oneHot, 'fileName': seg_map_name}
 
         if self.transform:
             sample = self.transform(sample)
@@ -211,7 +211,9 @@ class Rescale(object):
         return {'image': img, 'fileName': fileName}
 
 
-dataset = SegMapDataset(file_list=file_list, anno_root_dir=anno_root_dir)
+dataset = SegMapDataset(file_list=file_list, imArray_list= imArray_list, anno_root_dir=anno_root_dir, refMap=refMap)
+
+# Specify using one-hot ?????????????
 
 dataloader = DataLoader(dataset, batch_size=batch_size,               # load data in chosen manner
                             shuffle=True, num_workers=workers)

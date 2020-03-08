@@ -1,6 +1,9 @@
 """
 This file does image pre processing. It obtains the correct images based on experiment requirement.
-Specifically,
+Specifically. Three important aspects of the data:
+    file_List: list of wanted file names and directories
+    imArray_list: list of list, size n-by-(256*256)), all in numpy array format. Representing segmentation map after class combination
+    ref_Map: one-hot encoding of each object classes, based on total number of classes in the wanted images.
 """
 
 
@@ -83,4 +86,4 @@ for file in file_list:
 
 print(classSet)
 refMap, num_classes = genRefMap(classSet)
-print('num class: ', num_classes)
+print('num classes: ', num_classes)
