@@ -17,80 +17,18 @@ from one_hot_helper import combineClasses
 
 #np.set_printoptions(threshold=np.inf)
 
-train = True
-by_category = True     # Load data from selected categories
+from pre_data import file_list, imArray_list, refMap
 
 ref_root_dir = "/Users/ericfu/Documents/ANU_Master/COMP8755_Project/dataset/ADEChallengeData2016/"
 anno_root_dir = "/Users/ericfu/Documents/ANU_Master/COMP8755_Project/dataset/" \
                "ADEChallengeData2016/annotations/training/"
-
-category = ['beach']      # multiple categories stored in a list
 ref_list_name = "sceneCategories.txt"
-file_list = []         # segmentation maps to use as training examples
 
-ref_list = os.path.join(ref_root_dir, ref_list_name)
-f = open(ref_list)
-
-classSet = set()    # what classes that the dataset contains.
-
-# Prepare segmentation maps from specified category of scenes ！！
-if by_category:
-
-    line = f.readline()
-    while line:
-        n, c = line.split(" ")
-        c = c[:-1]
-        path = os.path.join(anno_root_dir, n + ".png")
-        if c in category:
-            if train:
-                if 'train' in n and io.imread(path).shape == (256 ,256):
-                    file_list.append(n + ".png")
-            else:
-                if "val" in n and io.imread(path).shape == (256 ,256):
-                    file_list.append(n + ".png")
-        line = f.readline()
-    f.close()
-
-if by_category is False:
-
-    line = f.readline()
-    while line:
-        n, c = line.split(" ")
-        if train:
-            if 'train' in n:
-                file_list.append(n + ".png")
-        else:
-            if "val" in n:
-                file_list.append(n + ".png")
-        line = f.readline()
-    f.close()
-
-# Prepare the class list.
-for file in file_list:
-    im = io.imread(os.path.join(anno_root_dir, file))
-    imArray = np.asarray(im).reshape(1, -1)[0]
-    imArray = combineClasses(imArray)
-    imClasses = np.unique(imArray)
-    print("imClass: ", imClasses)
-    for c in imClasses:
-        classSet.add(c)
-
-print(classSet)
-refMap, num_classes = genRefMap(classSet)
-print('num class: ', num_classes)
-
-# Temporary testing use
-# testimg = io.imread(os.path.join(anno_root_dir, file_list[1]))
-# print(testimg.shape)
-# rtn = covertToOnehot(testimg, refMap, num_classes)
-# print(rtn.shape)
-# print(rtn)
-# print(rtn[1][1])
 
 class SegMapDataset (Dataset):
     """ Segmentation map dataset for 1st phase of the network. """
 
-    def __init__(self, file_list, anno_root_dir, transform=None):
+    def __init__(self, file_list, imArray_list, anno_root_dir, refMap, transform=None):
         """
         Args:
             :param file_list: list of selected image file names to retrieve
@@ -99,7 +37,10 @@ class SegMapDataset (Dataset):
             on a sample.
         """
         self.file_list = file_list
+        self.imArray_list = imArray_list
         self.anno_root_dir = anno_root_dir
+        self.refMap = refMap
+        self.cNum = len(refMap)
         self.transform = transform
 
     def __len__(self):
@@ -111,9 +52,10 @@ class SegMapDataset (Dataset):
 
         seg_map_name = os.path.join(self.anno_root_dir, self.file_list[idx])
         image = io.imread(seg_map_name)
-        img = covertToOnehot(image, refMap, num_classes)
+        imArray = self.imArray_list[idx]
+        oneHot = covertToOnehot(imArray, self.refMap, self.cNum)
 
-        sample = {'image': img, 'fileName': seg_map_name}
+        sample = {'image': image, 'imArray': imArray, 'oneHot': oneHot, 'fileName': seg_map_name}
 
         if self.transform:
             sample = self.transform(sample)
@@ -158,7 +100,7 @@ class Rescale(object):
 
         return {'image': img, 'fileName': fileName}
 
-myData = SegMapDataset(file_list=file_list, anno_root_dir=anno_root_dir)
+myData = SegMapDataset(file_list=file_list, imArray_list= imArray_list, anno_root_dir=anno_root_dir, refMap=refMap)
 
 k = 0
 
@@ -166,13 +108,13 @@ print(len(myData))
 
 for i in range(len(myData)):
     sample = myData[i]
-    print(i, sample['image'].shape, sample['fileName'])
+    print(i, sample['oneHot'].shape, sample['fileName'])
 
 dataloader = DataLoader(myData, batch_size=4,               # load data in chosen manner
                             shuffle=True, num_workers=4)
 
-print(myData[3]['image'])
-plt.pause(10)
+print(myData[3]['oneHot'].shape, myData[3]['oneHot'][:, 10])
+
 
 
 

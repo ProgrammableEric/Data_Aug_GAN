@@ -39,27 +39,23 @@ def genRefMap (classSet):
     return refMap, num_classes
 
 
-def covertToOnehot(img, refMap, num_classes):
+def covertToOnehot(imArray, refMap, cNum):
 
     """
     This function takes the ioread output, and class reference map to encode the original image
     to a one-hot format based on the class reference map.
 
-    :param img: of type 'imageio.core.util.Array'
+    :param imgArray, numpy array of size npixels * 1, representing combine object classes of each pixel
     :param refMap: Class reference map, in the form of { pixel value: class code }
-    :param num_classes: Total number of semantic classes within the dataset
-    :return: 3D numpy array, one-hot encoded image of size (H-by-W-by-num_classes)
+    :return: 2D numpy array of one-hot expression, size numClasses-by-numPixels. e.g, 256*256 image with 10 object classes will
+             be represented as 10-by-65536 numpy array
     """
-    h = img.shape[0]
-    w = img.shape[1]
-    img = np.asarray(img)   ## img 格式问题，一行还是r行？
-    img = combineClasses(img)
-    num_ele = h * w
+    nPix = len(imArray)
 
-    rtn = np.zeros((num_classes, h, w))
-    for j, _ in enumerate(img):
-        for k, pixel in enumerate(img[j]):
-            rtn[refMap[pixel]][j][k] = 1
+    rtn = np.zeros((cNum, nPix))
+
+    for k, pixel in enumerate(imArray):
+        rtn[refMap[pixel]][k] = 1
 
     return rtn
 
