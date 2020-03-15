@@ -396,14 +396,13 @@ print("Starting Training Loop...")
 for epoch in range(num_epochs):
     # For each batch in the dataloader
     for i, data in enumerate(dataloader, 0):
-        print('Epoch: ', epoch, 'batch: ', i)
-        print('A BATCH')
-        print(data['image'].shape)
+        print('\n', 'Epoch: ', epoch, 'batch: ', i, '***************************************************')
+        print(data['oneHot'].shape)
         ############################
         # (1) Update D network: maximize log(D(x)) + log(1 - D(G(z)))
         ###########################
         ## Train with all-real batch
-        netD.zero_grad()
+        # netD.zero_grad()
         # Format batch
         real_cpu = data['oneHot'].to(device)
         print("real cpu shape: ", real_cpu.shape)
@@ -426,7 +425,6 @@ for epoch in range(num_epochs):
         # Generate fake image batch with G
         fake = netG(noise)
         print("fake size: ", fake.shape)
-        print(fake[2][10])
         label.fill_(fake_label)
         print("label fake: ", label)
         # Classify all fake batch with D
@@ -447,7 +445,7 @@ for epoch in range(num_epochs):
         ############################
         # (2) Update G network: maximize log(D(G(z)))
         ###########################
-        netG.zero_grad()
+        #netG.zero_grad()
         label.fill_(real_label)  # fake labels are real for generator cost
         # Since we just updated D, perform another forward pass of all-fake batch through D
         output = netD(fake).view(-1)
