@@ -54,7 +54,7 @@ class SegMapDataset (Dataset):
         seg_map_name = os.path.join(self.anno_root_dir, self.file_list[idx])
         image = io.imread(seg_map_name)
         imArray = self.imArray_list[idx]
-        oneHot = covertToOnehot(imArray, self.refMap, self.cNum, 256)
+        oneHot = covertToOnehot(imArray, self.refMap, self.cNum, 256, 'U')
 
         sample = {'image': image, 'imArray': imArray, 'oneHot': oneHot, 'fileName': seg_map_name}
 
@@ -114,7 +114,7 @@ class ToTensor(object):
         return {'image': torch.from_numpy(image),
                 'imArray': imArray,
                 'oneHot': oneHot,
-                'fileName': fileName }
+                'fileName': fileName}
 
 myData = SegMapDataset(file_list=file_list, imArray_list= imArray_list, anno_root_dir=anno_root_dir, refMap=refMap,
                        transform=transforms.Compose([ToTensor()]))

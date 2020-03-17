@@ -15,6 +15,9 @@ from skimage import io, transform
 from one_hot_helper import covertToOnehot
 from one_hot_helper import genRefMap
 from one_hot_helper import combineClasses
+from ade20k_seg_data import SegMapDataset
+from ade20k_seg_data import Rescale
+from ade20k_seg_data import ToTensor
 
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
@@ -101,7 +104,7 @@ print('num classes: ', num_classes)
 workers = 2
 
 # Batch size during training
-batch_size = 4
+batch_size = 32
 
 # Spatial size of training images. All images will be resized to this
 #   size using a transformer.
@@ -120,7 +123,7 @@ ngf = 32
 ndf = 32
 
 # Number of training epochs
-num_epochs = 50
+num_epochs = 100
 
 # Learning rate for optimizers
 lr = 0.0002
@@ -133,103 +136,11 @@ ngpu = 1
 
 
 
-""" PREPARE THE DATASET """
-
-class SegMapDataset (Dataset):
-    """ Segmentation map dataset for 1st phase of the network. """
-
-    def __init__(self, file_list, imArray_list, anno_root_dir, refMap, transform=None):
-        """
-        Args:
-            :param file_list: list of selected image file names to retrieve
-            :param anno_root_dir: Directory that the samples are stored
-            :param transform: Optional transform to be applied
-            on a sample.
-        """
-        self.file_list = file_list
-        self.imArray_list = imArray_list
-        self.anno_root_dir = anno_root_dir
-        self.refMap = refMap
-        self.cNum = len(refMap)
-        self.transform = transform
-
-    def __len__(self):
-        return len(file_list)
-
-    def __getitem__(self, idx):
-        if torch.is_tensor(idx):
-            idx = idx.tolist()
-
-        seg_map_name = os.path.join(self.anno_root_dir, self.file_list[idx])
-        image = io.imread(seg_map_name)
-        imArray = self.imArray_list[idx]
-        oneHot = covertToOnehot(imArray, self.refMap, self.cNum, 256)
-
-        sample = {'image': image, 'imArray': imArray, 'oneHot': oneHot, 'fileName': seg_map_name}
-
-        if self.transform:
-            sample = self.transform(sample)
-
-        return sample
-
-
-class Rescale(object):
-    """Rescale the image in a sample to a given size. Always assume that we want
-    a square image input (h=w)
-
-    Args:
-        output_size (tuple or int): Desired output size. If tuple, output is
-            matched to output_size. If int, smaller of image edges is matched
-            to output_size keeping aspect ratio the same.
-    """
-
-    def __init__(self, output_size):
-        assert isinstance(output_size, (int, tuple))
-        self.output_size = output_size
-
-    def __call__(self, sample):      # 为了将一个类作为函数调用
-        image, fileName = sample['image'], sample['fileName']
-
-        h, w = image.shape[:2]
-        if isinstance(self.output_size, int):
-            # if h > w:
-            #     new_h, new_w = self.output_size * h / w, self.output_size
-            # else:
-            #     new_h, new_w = self.output_size, self.output_size * w / h
-            new_h = self.output_size
-            new_w = self.output_size
-        else:
-            new_h, new_w = self.output_size
-
-        new_h, new_w = int(new_h), int(new_w)
-
-        img = transform.resize(image, (new_h, new_w), preserve_range=True)
-
-        # h and w are swapped for landmarks because for images,
-        # x and y axes are axis 1 and 0 respectively
-
-        return {'image': img, 'fileName': fileName}
-
-class ToTensor(object):
-    """Convert ndarrays in sample to Tensors."""
-
-    def __call__(self, sample):
-        image, imArray, oneHot, fileName = sample['image'], sample['imArray'], sample['oneHot'], sample['fileName']
-
-        # swap color axis because
-        # numpy image: H x W x C
-        # torch image: C X H X W
-
-        return {'image': torch.from_numpy(image),
-                'imArray': imArray,
-                'oneHot': oneHot,
-                'fileName': fileName}
+""" PREPARE THE DATASET (from ade20k_seg_data.py) """
 
 
 dataset = SegMapDataset(file_list=file_list, imArray_list= imArray_list, anno_root_dir=anno_root_dir, refMap=refMap,
                         transform=transforms.Compose([ToTensor()]))
-
-# Specify using one-hot ?????????????
 
 dataloader = DataLoader(dataset, batch_size=batch_size,               # load data in chosen manner
                             shuffle=True, num_workers=workers)
@@ -291,14 +202,13 @@ class Generator(nn.Module):
             nn.ReLU(True),
             # state size. (ngf) x 128 x 128
             nn.ConvTranspose2d(ngf, nc, 4, 2, 1, bias=False),
-            nn.Softmax(dim=1)
+            nn.Softmax2d()
 
             # state size. (nc) x 256 x 256
-
         )
 
     def forward(self, input):
-        return softmax(self.main(input), 2)
+        return self.main(input)
 
     # Create the generator
 netG = Generator(ngpu).to(device)
@@ -402,7 +312,7 @@ for epoch in range(num_epochs):
         # (1) Update D network: maximize log(D(x)) + log(1 - D(G(z)))
         ###########################
         ## Train with all-real batch
-        # netD.zero_grad()
+        netD.zero_grad()
         # Format batch
         real_cpu = data['oneHot'].to(device)
         print("real cpu shape: ", real_cpu.shape)
@@ -445,7 +355,7 @@ for epoch in range(num_epochs):
         ############################
         # (2) Update G network: maximize log(D(G(z)))
         ###########################
-        #netG.zero_grad()
+        netG.zero_grad()
         label.fill_(real_label)  # fake labels are real for generator cost
         # Since we just updated D, perform another forward pass of all-fake batch through D
         output = netD(fake).view(-1)
@@ -459,7 +369,7 @@ for epoch in range(num_epochs):
         optimizerG.step()
 
         # Output training stats
-        if i % 50 == 0:
+        if i % 5 == 0:
             print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
                   % (epoch, num_epochs, i, len(dataloader),
                      errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
