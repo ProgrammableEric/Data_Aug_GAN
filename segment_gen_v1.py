@@ -39,7 +39,7 @@ ref_root_dir = "/Users/ericfu/Documents/ANU_Master/COMP8755_Project/dataset/ADEC
 anno_root_dir = "/Users/ericfu/Documents/ANU_Master/COMP8755_Project/dataset/" \
                "ADEChallengeData2016/annotations/training/"
 
-category = ['beach']      # multiple categories stored in a list
+category = ['bedroom']      # multiple categories stored in a list
 ref_list_name = "sceneCategories.txt"
 file_list = []         # segmentation maps to use as training examples
 imArray_list = []
