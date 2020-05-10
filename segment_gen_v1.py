@@ -39,7 +39,7 @@ ref_root_dir = "/Users/ericfu/Documents/ANU_Master/COMP8755_Project/dataset/ADEC
 anno_root_dir = "/Users/ericfu/Documents/ANU_Master/COMP8755_Project/dataset/" \
                "ADEChallengeData2016/annotations/training/"
 
-category = ['bedroom']      # multiple categories stored in a list
+category = ['bedroom', 'dining_room', 'childs_room', 'conference_room', 'game_room']      # multiple categories stored in a list
 ref_list_name = "sceneCategories.txt"
 file_list = []         # segmentation maps to use as training examples
 imArray_list = []
@@ -74,10 +74,10 @@ if by_category is False:
         n, c = line.split(" ")
         if train:
             if 'train' in n:
-                file_list.append(n + ".png")
+                file_list.append(n + ".jpg")
         else:
             if "val" in n:
-                file_list.append(n + ".png")
+                file_list.append(n + ".jpg")
         line = f.readline()
     f.close()
 
@@ -104,7 +104,7 @@ print('num classes: ', num_classes)
 workers = 2
 
 # Batch size during training
-batch_size = 32
+batch_size = 16
 
 # Spatial size of training images. All images will be resized to this
 #   size using a transformer.
@@ -117,16 +117,16 @@ nc = num_classes
 nz = 100
 
 # Size of feature maps in generator
-ngf = 32
+ngf = 16
 
 # Size of feature maps in discriminator (SET TO WHAT NUMBER????)
-ndf = 32
+ndf = 16
 
 # Number of training epochs
-num_epochs = 100
+num_epochs = 50
 
 # Learning rate for optimizers
-lr = 0.0002
+lr = 0.002
 
 # Beta1 hyperparam for Adam optimizers
 beta1 = 0.5

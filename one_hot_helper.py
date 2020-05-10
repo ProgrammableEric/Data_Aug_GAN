@@ -34,7 +34,6 @@ def genRefMap (classSet):
     for i, element in enumerate(cArray):
         refMap[element] = i
 
-    print(refMap)
 
     return refMap, num_classes
 
@@ -60,7 +59,7 @@ def covertToOnehot(imArray, refMap, cNum, Size, noise=None):
     if noise == 'G':
         rtn = np.random.normal(0.2, )
     elif noise == 'U':
-        rtn = np.ones((cNum, nPix)) * 0.7
+        rtn = np.ones((cNum, nPix)) * 0.5
     else:
         rtn = np.zeros((cNum, nPix))
 
@@ -93,7 +92,3 @@ def combineClasses(imArray):
                 imArray[c] = k
 
     return imArray
-
-# a = np.asarray([[1,2,3], [3,2,1]])
-# print(a)
-# print(a.reshape(1, -1)[0])
