@@ -1,23 +1,17 @@
 import torch
 import torch.nn as nn
-from torch.nn.functional import softmax
 import random
-from torch.utils.data import Dataset, DataLoader
-import torchvision.utils as vutils
+from torch.utils.data import DataLoader
 import torch.optim as optim
 from torchvision import transforms
-import pickle
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
 import os
-from skimage import io, transform
-from one_hot_helper import covertToOnehot
-from one_hot_helper import genRefMap
-from one_hot_helper import combineClasses
-from ade20k_seg_data import SegMapDataset
-from ade20k_seg_data import Rescale
-from ade20k_seg_data import ToTensor
+from skimage import io
+from segment_gen.one_hot_helper import genRefMap
+from segment_gen.one_hot_helper import combineClasses
+from segment_gen.ade20k_seg_data import SegMapDataset
+from segment_gen.ade20k_seg_data import ToTensor
 
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 

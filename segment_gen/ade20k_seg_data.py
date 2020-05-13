@@ -1,23 +1,15 @@
 #-*- coding: UTF-8 -*-
 
-import numpy as np
 import torch
-import torch.nn as nn
-from torch.autograd import Variable
 from torchvision import transforms
-from torchvision.utils import save_image
 from torch.utils.data import Dataset, DataLoader
-from sklearn.preprocessing import OneHotEncoder
-import matplotlib.pyplot as plt
 import os
 from skimage import io, transform
-from one_hot_helper import covertToOnehot
-from one_hot_helper import genRefMap
-from one_hot_helper import combineClasses
+from segment_gen.one_hot_helper import covertToOnehot
 
 #np.set_printoptions(threshold=np.inf)
 
-from pre_data import file_list, imArray_list, refMap
+from segment_gen.pre_data import file_list, imArray_list, refMap
 
 
 ref_root_dir = "/Users/ericfu/Documents/ANU_Master/COMP8755_Project/dataset/ADEChallengeData2016/"

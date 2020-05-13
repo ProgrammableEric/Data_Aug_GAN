@@ -9,19 +9,10 @@ Specifically. Three important aspects of the data:
 
 
 import numpy as np
-import torch
-import torch.nn as nn
-from torch.autograd import Variable
-from torchvision import transforms
-from torchvision.utils import save_image
-from torch.utils.data import Dataset, DataLoader
-from sklearn.preprocessing import OneHotEncoder
-import matplotlib.pyplot as plt
 import os
-from skimage import io, transform
-from one_hot_helper import covertToOnehot
-from one_hot_helper import genRefMap
-from one_hot_helper import combineClasses
+from skimage import io
+from segment_gen.one_hot_helper import genRefMap
+from segment_gen.one_hot_helper import combineClasses
 
 
 train = True
