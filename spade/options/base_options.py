@@ -9,7 +9,7 @@ import os
 from spade.util import util
 import torch
 import spade.models as models
-import data
+import spade.data as data
 import pickle
 
 
@@ -19,9 +19,9 @@ class BaseOptions():
 
     def initialize(self, parser):
         # experiment specifics
-        parser.add_argument('--name', type=str, default='label2coco', help='name of the experiment. It decides where to store samples and models')
+        parser.add_argument('--name', type=str, default='beach', help='name of the experiment. It decides where to store samples and models')
 
-        parser.add_argument('--gpu_ids', type=str, default='0', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
+        parser.add_argument('--gpu_ids', type=str, default='-1', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
         parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints', help='models are saved here')
         parser.add_argument('--model', type=str, default='pix2pix', help='which model to use')
         parser.add_argument('--norm_G', type=str, default='spectralinstance', help='instance normalization or batch normalization')
@@ -41,7 +41,7 @@ class BaseOptions():
 
         # for setting inputs
         parser.add_argument('--dataroot', type=str, default='./datasets/beach/')   # change here for different dataset directories
-        parser.add_argument('--dataset_mode', type=str, default='coco')
+        parser.add_argument('--dataset_mode', type=str, default='beach')  # change this !!!
         parser.add_argument('--serial_batches', action='store_true', help='if true, takes images in order to make batches, otherwise takes them randomly')
         parser.add_argument('--no_flip', action='store_true', help='if specified, do not flip the images for data argumentation')
         parser.add_argument('--nThreads', default=0, type=int, help='# threads for loading data')

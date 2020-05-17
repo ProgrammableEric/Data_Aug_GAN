@@ -12,7 +12,7 @@ from PIL import Image
 import os
 import argparse
 import dill as pickle
-import util.coco
+import spade.util.coco as coco
 
 
 def save_obj(obj, name):
@@ -251,7 +251,7 @@ def labelcolormap(N):
                 'grass': (29, 195, 49)
             }
             for i in range(N):
-                name = util.coco.id2label(i)
+                name = coco.id2label(i)
                 if name in important_colors:
                     color = important_colors[name]
                     cmap[i] = np.array(list(color))

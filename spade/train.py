@@ -6,7 +6,7 @@ Licensed under the CC BY-NC-SA 4.0 license (https://creativecommons.org/licenses
 import sys
 from collections import OrderedDict
 from spade.options.train_options import TrainOptions
-import data
+import spade.data as data
 from spade.util.iter_counter import IterationCounter
 from spade.util.visualizer import Visualizer
 from spade.trainer.pix2pix_trainer import Pix2PixTrainer

@@ -15,12 +15,12 @@ from segment_gen.one_hot_helper import genRefMap
 from segment_gen.one_hot_helper import combineClasses
 
 
-train = False
+train = True
 by_category = True     # Load data from selected categories
 
 ref_root_dir = "/Users/ericfu/Documents/ANU_Master/COMP8755_Project/dataset/ADEChallengeData2016/"
 anno_root_dir = "/Users/ericfu/Documents/ANU_Master/COMP8755_Project/dataset/" \
-               "ADEChallengeData2016/annotations/validation/"
+               "ADEChallengeData2016/annotations/training/"
 
 category = ['beach']      # multiple categories stored in a list
 ref_list_name = "sceneCategories.txt"

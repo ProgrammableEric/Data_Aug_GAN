@@ -1,3 +1,10 @@
+"""
+Proof of concept - Beach dataset extracted from ADE20K 2016 Dataset
+Author: Chunze Fu
+"""
+
+
+
 import os.path
 from spade.data.pix2pix_dataset import Pix2pixDataset
 from spade.data.image_folder import make_dataset
@@ -24,6 +31,7 @@ class BeachDataset(Pix2pixDataset):
         parser.set_defaults(batchSize=8)
         parser.set_defaults(display_winsize=256)
         parser.set_defaults(no_instance=True)
+        parser.set_defaults(contain_dontcare_label=False)
         return parser
 
 
@@ -43,5 +51,6 @@ class BeachDataset(Pix2pixDataset):
         else:
             instance_paths = []
 
+        assert len(label_paths) == len(image_paths), "The #images in %s and %s do not match. Is there something wrong?"
 
         return label_paths, image_paths, instance_paths

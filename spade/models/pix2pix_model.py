@@ -17,6 +17,7 @@ class Pix2PixModel(torch.nn.Module):
     def __init__(self, opt):
         super().__init__()
         self.opt = opt
+        print("gpu:", self.use_gpu())
         self.FloatTensor = torch.cuda.FloatTensor if self.use_gpu() \
             else torch.FloatTensor
         self.ByteTensor = torch.cuda.ByteTensor if self.use_gpu() \
@@ -115,10 +116,15 @@ class Pix2PixModel(torch.nn.Module):
 
         # create one-hot label map
         label_map = data['label']
+        print(label_map)
+        print(label_map.size())
         bs, _, h, w = label_map.size()
+        print("bs: ", bs, "H: ", h, "W: ", w)
         nc = self.opt.label_nc + 1 if self.opt.contain_dontcare_label \
             else self.opt.label_nc
+        print("nc: ", nc)
         input_label = self.FloatTensor(bs, nc, h, w).zero_()
+        print("input label size: ", input_label.size())
         input_semantics = input_label.scatter_(1, label_map, 1.0)
 
         # concatenate instance map if it exists

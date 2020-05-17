@@ -8,7 +8,7 @@ import numpy as np
 import torch.nn.functional as F
 from spade.models.networks.network import BaseNetwork
 from spade.models.networks.normalization import get_nonspade_norm_layer
-# import util.util as util
+import spade.util.util as util
 
 
 class MultiscaleDiscriminator(BaseNetwork):
