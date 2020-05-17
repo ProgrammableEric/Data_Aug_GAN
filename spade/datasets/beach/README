@@ -1,0 +1,7 @@
+Proof of concept use
+
+dataset contains only 1 scene class - beach.
+
+training size: 72
+validation size: 7
+object classes: 20

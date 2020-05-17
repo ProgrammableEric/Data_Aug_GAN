@@ -15,12 +15,12 @@ from segment_gen.one_hot_helper import genRefMap
 from segment_gen.one_hot_helper import combineClasses
 
 
-train = True
+train = False
 by_category = True     # Load data from selected categories
 
 ref_root_dir = "/Users/ericfu/Documents/ANU_Master/COMP8755_Project/dataset/ADEChallengeData2016/"
 anno_root_dir = "/Users/ericfu/Documents/ANU_Master/COMP8755_Project/dataset/" \
-               "ADEChallengeData2016/annotations/training/"
+               "ADEChallengeData2016/annotations/validation/"
 
 category = ['beach']      # multiple categories stored in a list
 ref_list_name = "sceneCategories.txt"
@@ -28,10 +28,12 @@ file_list = []         # segmentation maps to use as training examples
 imArray_list = []
 
 ref_list = os.path.join(ref_root_dir, ref_list_name)
+print(ref_list)
 f = open(ref_list)
 
 classSet = set()    # what classes that the dataset contains.
 
+count = 0
 # Prepare segmentation maps from specified category of scenes ！！
 if by_category:
 
@@ -41,11 +43,13 @@ if by_category:
         c = c[:-1]
         path = os.path.join(anno_root_dir, n + ".png")
         if c in category:
+            count = count + 1
+            print(count)
             if train:
-                if 'train' in n and io.imread(path).shape == (256 ,256):
+                if 'train' in n:
                     file_list.append(n + ".png")
             else:
-                if "val" in n and io.imread(path).shape == (256 ,256):
+                if "val" in n:
                     file_list.append(n + ".png")
         line = f.readline()
     f.close()
@@ -66,9 +70,10 @@ if by_category is False:
 
 # Prepare the image Arrays and class list.
 for file in file_list:
+    print(file)
     im = io.imread(os.path.join(anno_root_dir, file))
     imArray = np.asarray(im).reshape(1, -1)[0]
-    imArray = combineClasses(imArray)
+    # imArray = combineClasses(imArray)
     imArray_list.append(imArray)
     imClasses = np.unique(imArray)
     print("imClass: ", imClasses)
